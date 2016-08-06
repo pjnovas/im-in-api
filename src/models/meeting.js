@@ -24,15 +24,14 @@ export default {
     },
     datetime: {
       type : 'number',
-      required : true
+      required : false //true
     },
     max: {
-      type : 'number',
-      defaultsTo: 0
+      type : 'number'
     },
     location: {
       type : 'string',
-      required : true
+      required : false //true
     },
     attendants: {
       type : 'array',

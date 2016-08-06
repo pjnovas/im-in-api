@@ -2,7 +2,7 @@
 import { Server } from 'hapi';
 const server = new Server();
 
-server.connection({ port: 1337, host: 'localhost' });
+server.connection({ port: 1337, host: 'localhost', routes: { cors: true } });
 
 var dogwaterOptions = {
   connections: {
