@@ -1,10 +1,10 @@
 
 const bedwetter = {
-  model: 'meeting'
+  model: 'event'
 };
 
 export default [{
-  path: '/meetings',
+  path: '/events',
   method: 'GET',
   config: {
     handler: {
@@ -12,7 +12,7 @@ export default [{
     }
   }
 }, {
-  path: '/meetings/{id}',
+  path: '/events/{id}',
   method: 'GET',
   config: {
     handler: {
@@ -20,7 +20,7 @@ export default [{
     }
   }
 }, {
-  path: '/meetings',
+  path: '/events',
   method: 'POST',
   config: {
     handler: {
@@ -28,7 +28,7 @@ export default [{
     }
   }
 }, {
-  path: '/meetings/{id}',
+  path: '/events/{id}',
   method: ['PATCH', 'POST'],
   config: {
     handler: {
@@ -36,7 +36,7 @@ export default [{
     }
   }
 }, {
-  path: '/meetings/{id}',
+  path: '/events/{id}',
   method: 'DELETE',
   config: {
     handler: {

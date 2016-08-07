@@ -2,7 +2,7 @@
 import { generate } from 'shortid';
 
 export default {
-  identity: 'meeting',
+  identity: 'event',
   connection: 'iminDB',
   attributes: {
     id: {
