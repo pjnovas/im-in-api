@@ -4,6 +4,7 @@ import { generate } from 'shortid';
 export default {
   identity: 'event',
   connection: 'iminDB',
+  tableName: 'events',
   attributes: {
     id: {
       type: 'string',
@@ -23,15 +24,15 @@ export default {
       required : true
     },
     datetime: {
-      type : 'number',
-      required : false //true
+      type : 'datetime',
+      required : true
     },
     max: {
-      type : 'number'
+      type : 'integer'
     },
     location: {
       type : 'string',
-      required : false //true
+      required : true
     },
     attendants: {
       type : 'array',
