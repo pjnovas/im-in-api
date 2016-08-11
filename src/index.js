@@ -19,6 +19,8 @@ var dogwaterOptions = {
   models: require('./models')
 };
 
+require('./authStrategy')(server);
+
 server.register([{
     register : require('blipp')
   },{

@@ -4,7 +4,7 @@ const bedwetter = {
 };
 
 export default [{
-  path: '/events',
+  path: '/events', // TODO: change this route to "my-events"
   method: 'GET',
   config: {
     handler: {
@@ -23,6 +23,7 @@ export default [{
   path: '/events',
   method: 'POST',
   config: {
+    auth: 'simple',
     handler: {
       bedwetter
     }
@@ -31,6 +32,7 @@ export default [{
   path: '/events/{id}',
   method: ['PATCH', 'POST'],
   config: {
+    auth: 'simple',
     handler: {
       bedwetter
     }
@@ -39,6 +41,7 @@ export default [{
   path: '/events/{id}',
   method: 'DELETE',
   config: {
+    auth: 'simple',
     handler: {
       bedwetter
     }
