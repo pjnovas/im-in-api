@@ -4,7 +4,8 @@
   "description": "Server",
   "main": "index.js",
   "scripts": {
-    "start": "node index.js"
+    "start": "node index.js",
+    "test": "NODE_ENV=test babel-node ./node_modules/.bin/isparta cover _mocha"
   },
   "author": "Pablo Novas <pjnovas@gmail.com>",
   "dependencies": {
@@ -14,16 +15,24 @@
     "babel-preset-es2015": "^6.13.2",
     "babel-preset-stage-0": "^6.5.0",
     "babel-register": "^6.11.6",
-    "bedwetter": "^1.8.2",
     "blipp": "^2.2.1",
-    "dogwater": "^0.4.7",
-    "hapi": "^8.8.0",
+    "bluebird": "^3.4.1",
+    "hapi": "^14.1.0",
     "hapi-auth-bearer-token": "^4.2.0",
+    "joi": "^9.0.4",
+    "mongoose": "^4.5.8",
     "sails-mongo": "^0.12.1",
-    "shortid": "^2.2.2"
+    "shortid": "^2.2.2",
+    "uuid": "^2.0.2"
   },
   "devDependencies": {
     "babel-eslint": "^6.1.2",
-    "eslint": "^3.2.2"
+    "boom": "^3.2.2",
+    "chai": "^3.5.0",
+    "chai-http": "^3.0.0",
+    "eslint": "^3.2.2",
+    "isparta": "^4.0.0",
+    "istanbul": "^0.4.4",
+    "mocha": "^3.0.2"
   }
 }

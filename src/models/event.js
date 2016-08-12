@@ -20,8 +20,7 @@ export default {
       type : 'string'
     },
     owner: {
-      type : 'email',
-      required : true
+      model: 'user'
     },
     datetime: {
       type : 'datetime',

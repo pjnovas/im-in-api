@@ -1,41 +1,26 @@
 
 import { Server } from 'hapi';
+import { server as serverConfig } from './config';
+import database from './database';
+
 const server = new Server();
 
-server.connection({ port: 1337, host: 'localhost', routes: { cors: true } });
-
-var dogwaterOptions = {
-  connections: {
-    iminDB : {
-      adapter: 'iminMongo',
-      //host: 'localhost',
-      //port: 27017,
-      database: 'imin'
-    }
-  },
-  adapters:{
-    iminMongo : 'sails-mongo'
-  },
-  models: require('./models')
-};
+let { port, host } = serverConfig;
+server.connection({ port, host, routes: { cors: true } });
 
 require('./authStrategy')(server);
 
 server.register([{
-    register : require('blipp')
-  },{
-    register: require('dogwater'),
-    options: dogwaterOptions
-  },{
-    register: require('bedwetter'),
-    options: {}
-  }
-], err => {
-    if (err) { return console.log(err); }
+  register : require('blipp')
+}], err => {
+  if (err) { return console.log(err); }
 
-    server.route(require('./routes'));
+  server.route(require('./routes'));
 
-    server.start(() => {
-      console.log('API up and running at:', server.info.uri);
-    });
+  server.start(() => {
+    console.log('API up and running at:', server.info.uri);
+  });
+
 });
+
+export default server;

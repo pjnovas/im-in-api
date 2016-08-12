@@ -17,8 +17,11 @@ build/Release
 # https://www.npmjs.org/doc/misc/npm-faq.html#should-i-check-my-node_modules-folder-into-git
 node_modules
 npm-debug.log
+coverage
 
 # Bower
 bower_components/
 
 .tmp/
+src/config/config.dev.json
+src/config/config.prod.json

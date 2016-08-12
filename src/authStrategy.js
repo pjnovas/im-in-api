@@ -1,26 +1,21 @@
 import AuthBearer from 'hapi-auth-bearer-token';
+import { User } from './models';
 
 export default server => {
 
   server.register(AuthBearer, err => {
-    if (err){
-      console.log(err);
-      return;
-    }
+    if (err) return console.log(err);
 
     server.auth.strategy('simple', 'bearer-access-token', {
-      allowQueryToken: false,              // optional, true by default
-      //allowMultipleHeaders: false,        // optional, false by default
-      //accessTokenName: 'access_token',    // optional, 'access_token' by default
+      allowQueryToken: false,
       validateFunc: function (token, callback) {
-        //var request = this;
 
-        // TODO: Validate Token
-        if (token === "1234") {
-          return callback(null, true, { token });
-        }
+        User.findOne({ token }, (err, user) => {
+          if (err) return callback(err);
+          if (!user) return callback(null, false);
 
-        callback(null, false, { token });
+          return callback(null, true, user);
+        });
       }
     });
   });
