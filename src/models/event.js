@@ -1,41 +1,18 @@
+'use strict';
 
-import { generate } from 'shortid';
+import mongoose from 'mongoose';
 
-export default {
-  identity: 'event',
-  connection: 'iminDB',
-  tableName: 'events',
-  attributes: {
-    id: {
-      type: 'string',
-      primaryKey: true,
-      unique: true,
-      defaultsTo: () => generate()
-    },
-    title: {
-      type : 'string',
-      required : true
-    },
-    info: {
-      type : 'string'
-    },
-    owner: {
-      model: 'user'
-    },
-    datetime: {
-      type : 'datetime',
-      required : true
-    },
-    max: {
-      type : 'integer'
-    },
-    location: {
-      type : 'string',
-      required : true
-    },
-    attendants: {
-      type : 'array',
-      defaultsTo: []
-    }
-  }
-};
+const EventSchema = new mongoose.Schema({
+  owner: { type: mongoose.Schema.Types.ObjectId, ref: 'User' },
+  title: { type: String, required : true },
+  datetime: { type: Date, required : true },
+  location: { type: String, required : true },
+  info: { type: String },
+  max: { type: Number }
+  //attendants: {
+  //  type : 'array',
+  //  defaultsTo: []
+  //}
+}, { timestamps: true, toJSON: { virtuals: true, versionKey: false } });
+
+export default mongoose.model('Event', EventSchema);

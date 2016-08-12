@@ -1,4 +1,4 @@
 export default {
-  //require('./event'),
-  User: require('./user')
+  User: require('./user'),
+  Event: require('./event')
 };

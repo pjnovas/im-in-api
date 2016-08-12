@@ -1,5 +1,5 @@
 
 export default Array.concat(
-//  require('./event'),
-  require('./auth')
+  require('./auth'),
+  require('./event')
 );

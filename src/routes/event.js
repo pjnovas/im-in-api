@@ -1,49 +1,19 @@
 
-const bedwetter = {
-  model: 'event'
-};
+import {
+  getMine,
+  getOne,
+  create,
+  update,
+  remove
+} from '../controller/events';
 
-export default [{
-  path: '/events', // TODO: change this route to "my-events"
-  method: 'GET',
-  config: {
-    handler: {
-      bedwetter
-    }
-  }
-}, {
-  path: '/events/{id}',
-  method: 'GET',
-  config: {
-    handler: {
-      bedwetter
-    }
-  }
-}, {
-  path: '/events',
-  method: 'POST',
-  config: {
-    auth: 'simple',
-    handler: {
-      bedwetter
-    }
-  }
-}, {
-  path: '/events/{id}',
-  method: ['PATCH', 'POST'],
-  config: {
-    auth: 'simple',
-    handler: {
-      bedwetter
-    }
-  }
-}, {
-  path: '/events/{id}',
-  method: 'DELETE',
-  config: {
-    auth: 'simple',
-    handler: {
-      bedwetter
-    }
-  }
-}];
+export default [
+  { method: 'GET', path: '/events', config: getMine },
+  { method: 'GET', path: '/events/{id}', config: getOne},
+  { method: 'POST', path: '/events', config: create },
+  { method: ['PATCH', 'PUT'], path: '/events/{id}', config: update },
+  { method: 'DELETE', path: '/events/{id}', config: remove }
+
+  //{ method: 'POST', path: '/events/{id}/attendants', config: join } // JOIN
+  //{ method: 'DELETE', path: '/events/{id}/attendants', config: leave } // LEAVE
+];
