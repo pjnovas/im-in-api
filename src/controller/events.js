@@ -43,14 +43,8 @@ exports.getMine = {
 };
 
 exports.getOne = {
-  handler: async (request, reply) => {
-
-    chain([
-      fetchEvent,
-      (request, reply) => reply(request.event.toJSON()).code(200)
-    ], request, reply);
-
-  }
+  handler: chain(fetchEvent,
+    (request, reply) => reply(request.event.toJSON()).code(200))
 };
 
 exports.create = {
@@ -93,34 +87,21 @@ exports.update = {
     }
   },
   auth: 'simple',
-  handler: async (request, reply) => {
+  handler: chain(fetchEvent, isEventOwner, async (request, reply) => {
+    delete request.payload._id;
+    delete request.payload.id;
 
-    chain([
-      fetchEvent,
-      isEventOwner,
-      async (request, reply) => {
-        delete request.payload._id;
-        delete request.payload.id;
+    request.event.set(request.payload);
+    await request.event.save();
 
-        request.event.set(request.payload);
-        await request.event.save();
-
-        return reply(request.event.toJSON()).code(200);
-      }
-    ], request, reply);
-  }
+    return reply(request.event.toJSON()).code(200);
+  })
 };
 
 exports.remove = {
   auth: 'simple',
-  handler: async (request, reply) => {
-    chain([
-      fetchEvent,
-      isEventOwner,
-      async (request, reply) => {
-        await request.event.remove();
-        return reply().code(204);
-      }
-    ], request, reply);
-  }
+  handler: chain(fetchEvent, isEventOwner, async (request, reply) => {
+    await request.event.remove();
+    return reply().code(204);
+  })
 };

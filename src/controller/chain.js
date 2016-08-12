@@ -1,5 +1,8 @@
 import Series from 'hapi-next';
 
-export default function(funcs, req, rep) {
-  return (new Series(funcs)).execute(req, rep);
+export default function() {
+  let funcs = Array.prototype.slice.call(arguments);
+  return function (request, reply){
+    (new Series(funcs)).execute(request, reply);
+  }
 }
