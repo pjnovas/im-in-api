@@ -3,6 +3,32 @@
 import Joi from 'joi';
 import Boom from 'boom';
 import { Event } from '../models';
+import chain from './chain';
+
+const fetchEvent = async (request, reply) => {
+  try {
+    let event = await Event.findById(request.params.id);
+
+    if (!event) {
+      return reply(Boom.notFound());
+    }
+
+    request.event = event;
+    reply.next();
+
+  } catch(err) {
+    if (err.name === 'CastError') return reply(Boom.notFound());
+    return reply(Boom.badImplementation(err));
+  }
+};
+
+const isEventOwner = async (request, reply) => {
+  if (request.event.owner.toString() !== request.auth.credentials.id.toString()){
+    return reply(Boom.forbidden('only owner can change this event'));
+  }
+
+  reply.next();
+};
 
 exports.getMine = {
   auth: 'simple',
@@ -18,18 +44,12 @@ exports.getMine = {
 
 exports.getOne = {
   handler: async (request, reply) => {
-    try {
-      let event = await Event.findById(request.params.id);
 
-      if (!event) {
-        return reply(Boom.notFound());
-      }
+    chain([
+      fetchEvent,
+      (request, reply) => reply(request.event.toJSON()).code(200)
+    ], request, reply);
 
-      return reply(event.toJSON()).code(200);
-    } catch(err) {
-      if (err.name === 'CastError') return reply(Boom.notFound());
-      return reply(Boom.badImplementation(err));
-    }
   }
 };
 
@@ -75,50 +95,32 @@ exports.update = {
   auth: 'simple',
   handler: async (request, reply) => {
 
-    try {
-      let event = await Event.findById(request.params.id);
+    chain([
+      fetchEvent,
+      isEventOwner,
+      async (request, reply) => {
+        delete request.payload._id;
+        delete request.payload.id;
 
-      if (!event) {
-        return reply(Boom.notFound());
+        request.event.set(request.payload);
+        await request.event.save();
+
+        return reply(request.event.toJSON()).code(200);
       }
-
-      if (event.owner.toString() !== request.auth.credentials.id.toString()){
-        return reply(Boom.forbidden('only owner can change this event'));
-      }
-
-      delete request.payload._id;
-      delete request.payload.id;
-
-      event.set(request.payload);
-      await event.save();
-
-      return reply(event.toJSON()).code(200);
-    } catch(err) {
-      if (err.name === 'CastError') return reply(Boom.notFound());
-      return reply(Boom.badImplementation(err));
-    }
+    ], request, reply);
   }
 };
 
 exports.remove = {
   auth: 'simple',
   handler: async (request, reply) => {
-    try {
-      let event = await Event.findById(request.params.id);
-
-      if (!event) {
-        return reply(Boom.notFound());
+    chain([
+      fetchEvent,
+      isEventOwner,
+      async (request, reply) => {
+        await request.event.remove();
+        return reply().code(204);
       }
-
-      if (event.owner.toString() !== request.auth.credentials.id.toString()){
-        return reply(Boom.forbidden('only owner can delete this event'));
-      }
-
-      await event.remove();
-      return reply().code(204);
-    } catch(err) {
-      if (err.name === 'CastError') return reply(Boom.notFound());
-      return reply(Boom.badImplementation(err));
-    }
+    ], request, reply);
   }
 };
