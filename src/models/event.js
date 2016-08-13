@@ -10,11 +10,8 @@ const EventSchema = new mongoose.Schema({
   datetime: { type: Date, required : true },
   location: { type: String, required : true },
   info: { type: String },
-  max: { type: Number }
-  //attendants: {
-  //  type : 'array',
-  //  defaultsTo: []
-  //}
+  max: { type: Number },
+  attendants: [{ type: mongoose.Schema.Types.ObjectId, ref: 'User' }]
 }, { timestamps: true, toJSON: { virtuals: true, versionKey: false } });
 
 export default mongoose.model('Event', EventSchema);

@@ -7,7 +7,11 @@ import chain from './chain';
 
 const fetchEvent = async (request, reply) => {
   try {
-    let event = await Event.findOne({sid: request.params.sid});
+    let event =
+      await Event
+        .findOne({sid: request.params.sid})
+        .populate('owner', 'id name')
+        .populate('attendants', 'id name');
 
     if (!event) {
       return reply(Boom.notFound());
@@ -23,7 +27,7 @@ const fetchEvent = async (request, reply) => {
 };
 
 const isEventOwner = async (request, reply) => {
-  if (request.event.owner.toString() !== request.auth.credentials.id.toString()){
+  if (request.event.owner.id.toString() !== request.auth.credentials.id.toString()){
     return reply(Boom.forbidden('only owner can change this event'));
   }
 
@@ -63,8 +67,11 @@ exports.create = {
   auth: 'simple',
   handler: async (request, reply) => {
     try {
+      delete request.payload.attendants;
+
       let event = new Event(request.payload);
       event.owner = request.auth.credentials.id;
+      event.attendants.push(event.owner);
       await event.save();
 
       return reply(event.toJSON()).code(200);
@@ -90,6 +97,8 @@ exports.update = {
   handler: chain(fetchEvent, isEventOwner, async (request, reply) => {
     delete request.payload._id;
     delete request.payload.id;
+    delete request.payload.sid;
+    delete request.payload.attendants;
 
     request.event.set(request.payload);
     await request.event.save();
@@ -102,6 +111,32 @@ exports.remove = {
   auth: 'simple',
   handler: chain(fetchEvent, isEventOwner, async (request, reply) => {
     await request.event.remove();
+    return reply().code(204);
+  })
+};
+
+exports.join = {
+  auth: 'simple',
+  handler: chain(fetchEvent, async (request, reply) => {
+    let newAtt = request.auth.credentials.id;
+    let exist = request.event.attendants.some( att => {
+      return att.id.toString() === newAtt.toString();
+    });
+
+    if (!exist){
+      request.event.attendants.push(newAtt);
+      await request.event.save();
+    }
+    return reply().code(204);
+  })
+};
+
+exports.leave = {
+  auth: 'simple',
+  handler: chain(fetchEvent, async (request, reply) => {
+    let removeAtt = request.auth.credentials.id;
+    request.event.attendants.remove(removeAtt);
+    await request.event.save();
     return reply().code(204);
   })
 };

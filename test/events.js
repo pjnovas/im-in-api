@@ -31,6 +31,14 @@ const createUser = (email, done) => {
     });
 };
 
+const checkUserPVT = (user, valid) => {
+  expect(user.token).to.not.be.ok;
+  expect(user.email).to.not.be.ok;
+
+  expect(user.id).to.be.equal(valid.id);
+  expect(user.name).to.be.equal(valid.name);
+};
+
 describe('Events', () => {
   let eventCreator;
   let testEvent;
@@ -72,6 +80,7 @@ describe('Events', () => {
         .end((err, res) => {
           expect(res.status).to.be.equal(200);
           let created = res.body;
+          testEvent = created;
 
           expect(created.id).to.be.ok;
           expect(created.sid).to.be.ok;
@@ -81,7 +90,9 @@ describe('Events', () => {
             expect(created[k]).to.be.equal(event[k]);
           });
 
-          testEvent = created;
+          expect(created.attendants).to.be.an('array');
+          expect(created.attendants.length).to.be.equal(1); // Must add the owner as attendant
+          expect(created.attendants[0]).to.be.equal(created.owner);
 
           done();
         });
@@ -100,10 +111,15 @@ describe('Events', () => {
 
           expect(event.id).to.be.equal(testEvent.id);
           expect(event.sid).to.be.equal(testEvent.sid);
-          expect(event.owner).to.be.equal(eventCreator.id);
 
+          checkUserPVT(event.owner, eventCreator.toJSON());
+          checkUserPVT(event.attendants[0], eventCreator.toJSON());
+
+          let avoid = ['attendants', 'id', '_id', 'owner'];
           Object.keys(event).forEach( k => {
-            expect(event[k]).to.be.equal(testEvent[k]);
+            if (avoid.indexOf(k) === -1){
+              expect(event[k]).to.be.equal(testEvent[k]);
+            }
           });
 
           done();
@@ -169,10 +185,15 @@ describe('Events', () => {
 
           expect(event.id).to.be.equal(testEvent.id);
           expect(event.sid).to.be.equal(testEvent.sid);
-          expect(event.owner).to.be.equal(eventCreator.id);
 
+          checkUserPVT(event.owner, eventCreator.toJSON());
+          checkUserPVT(event.attendants[0], eventCreator.toJSON());
+
+          let avoid = ['attendants', 'id', '_id', 'owner'];
           Object.keys(eventUpd).forEach( k => {
-            expect(eventUpd[k]).to.be.equal(event[k]);
+            if (avoid.indexOf(k) === -1){
+              expect(eventUpd[k]).to.be.equal(event[k]);
+            }
           });
 
           done();
@@ -205,6 +226,76 @@ describe('Events', () => {
             .set('Authorization', `Bearer ${eventCreator.token}`)
             .end((err, res) => {
               expect(res.status).to.be.equal(404);
+              done();
+            });
+        });
+    });
+
+  });
+
+  describe('POST /events/{id}/attendants', () => {
+
+    it('must allow to join an event by sid', done => {
+      chai.request(server.listener)
+        .post(`/events/${testEvent.sid}/attendants`)
+        .set('Authorization', `Bearer ${commonUsers[0].token}`)
+        .end((err, res) => {
+          expect(res.status).to.be.equal(204);
+
+          chai.request(server.listener)
+            .get(`/events/${testEvent.sid}`)
+            .end((err, res) => {
+              expect(res.status).to.be.equal(200);
+              let event = res.body;
+
+              expect(event.attendants.length).to.be.equal(2);
+              checkUserPVT(event.attendants[0], eventCreator.toJSON());
+              checkUserPVT(event.attendants[1], commonUsers[0].toJSON());
+
+              done();
+            });
+        });
+    });
+
+    it('must NOT allow to join twice to an event', done => {
+      chai.request(server.listener)
+        .post(`/events/${testEvent.sid}/attendants`)
+        .set('Authorization', `Bearer ${commonUsers[0].token}`)
+        .end((err, res) => {
+          expect(res.status).to.be.equal(204);
+
+          chai.request(server.listener)
+            .get(`/events/${testEvent.sid}`)
+            .end((err, res) => {
+              expect(res.status).to.be.equal(200);
+              let event = res.body;
+
+              expect(event.attendants.length).to.be.equal(2);
+              checkUserPVT(event.attendants[0], eventCreator.toJSON());
+              checkUserPVT(event.attendants[1], commonUsers[0].toJSON());
+
+              done();
+            });
+        });
+    });
+
+  });
+
+  describe('DELETE /events/{id}/attendants', () => {
+
+    it('must allow to leave an event by sid', done => {
+      chai.request(server.listener)
+        .delete(`/events/${testEvent.sid}/attendants`)
+        .set('Authorization', `Bearer ${commonUsers[0].token}`)
+        .end((err, res) => {
+          expect(res.status).to.be.equal(204);
+
+          chai.request(server.listener)
+            .get(`/events/${testEvent.sid}`)
+            .end((err, res) => {
+              expect(res.status).to.be.equal(200);
+              let event = res.body;
+              expect(event.attendants.length).to.be.equal(1);
               done();
             });
         });

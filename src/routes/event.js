@@ -4,7 +4,9 @@ import {
   getOne,
   create,
   update,
-  remove
+  remove,
+  join,
+  leave
 } from '../controller/events';
 
 export default [
@@ -12,8 +14,7 @@ export default [
   { method: 'GET', path: '/events/{sid}', config: getOne},
   { method: 'POST', path: '/events', config: create },
   { method: ['PATCH', 'PUT'], path: '/events/{sid}', config: update },
-  { method: 'DELETE', path: '/events/{sid}', config: remove }
-
-  //{ method: 'POST', path: '/events/{id}/attendants', config: join } // JOIN
-  //{ method: 'DELETE', path: '/events/{id}/attendants', config: leave } // LEAVE
+  { method: 'DELETE', path: '/events/{sid}', config: remove },
+  { method: 'POST', path: '/events/{sid}/attendants', config: join },
+  { method: 'DELETE', path: '/events/{sid}/attendants', config: leave }
 ];
