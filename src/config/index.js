@@ -16,6 +16,8 @@ try {
       break;
     }
   }
+
+  config.env = process.env.NODE_ENV || 'development';
 }
 catch (e){
   throw new Error('Expected configuration file at ./src/config/config.[env].json');

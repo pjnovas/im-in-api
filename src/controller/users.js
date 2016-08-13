@@ -4,6 +4,7 @@ import Joi from 'joi';
 import Boom from 'boom';
 import { User } from '../models';
 import uuid from 'uuid';
+import mailer from './email';
 
 exports.sendToken = {
   validate: {
@@ -24,9 +25,14 @@ exports.sendToken = {
       user.token = uuid.v4();
       await user.save();
 
-      // TODO: Send email token
+      mailer.sendToken(user.toJSON(), err => {
+        if (err) {
+          console.log(err);
+          return reply(Boom.badImplementation('Error on sending email'));
+        }
+        return reply().code(204);
+      });
 
-      return reply().code(204);
     } catch(err) {
       return reply(Boom.badImplementation(err));
     }
