@@ -5,9 +5,7 @@ import { createTransport } from 'nodemailer';
 const transport = createTransport(mailer.transport);
 
 exports.sendToken = (user, done) => {
-  const url = `${mailer.tokens.host}
-    ?token=${user.token}
-    &uid=${encodeURIComponent(user.id)}`;
+  const url = `${mailer.tokens.host}?token=${user.token}&uid=${encodeURIComponent(user.id)}`;
 
   const mailOpts = {
     from: mailer.tokens.sender,
@@ -17,8 +15,12 @@ exports.sendToken = (user, done) => {
     html: `Hey!, Access your account at: ${url}`
   };
 
-  if (env !== 'test'){
+  if (env === 'production'){
     return transport.sendMail(mailOpts, done);
+  }
+
+  if (env === 'development'){
+    console.log(`EMAIL TO ${user.email} :: ${url}`);
   }
 
   done();
