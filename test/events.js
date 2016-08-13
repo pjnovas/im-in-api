@@ -10,6 +10,7 @@ const server = require('../src/index');
 const expect = chai.expect;
 
 import mongoose from 'mongoose';
+import shortid from 'shortid';
 
 chai.use(chaiHttp);
 
@@ -73,6 +74,7 @@ describe('Events', () => {
           let created = res.body;
 
           expect(created.id).to.be.ok;
+          expect(created.sid).to.be.ok;
           expect(created.owner).to.be.equal(eventCreator.id);
 
           Object.keys(event).forEach( k => {
@@ -87,16 +89,17 @@ describe('Events', () => {
 
   });
 
-  describe('GET /events/{id}', () => {
+  describe('GET /events/{sid}', () => {
 
-    it('must allow to get an event by id', done => {
+    it('must allow to get an event by its short-id', done => {
       chai.request(server.listener)
-        .get(`/events/${testEvent.id}`)
+        .get(`/events/${testEvent.sid}`)
         .end((err, res) => {
           expect(res.status).to.be.equal(200);
           let event = res.body;
 
           expect(event.id).to.be.equal(testEvent.id);
+          expect(event.sid).to.be.equal(testEvent.sid);
           expect(event.owner).to.be.equal(eventCreator.id);
 
           Object.keys(event).forEach( k => {
@@ -147,7 +150,7 @@ describe('Events', () => {
 
   describe('PUT /events/{id}', () => {
 
-    it('must allow to update an event by id', done => {
+    it('must allow to update an event by sid', done => {
       const eventUpd = {
         title: 'Event Title Upd',
         datetime: (new Date).toISOString(),
@@ -157,7 +160,7 @@ describe('Events', () => {
       };
 
       chai.request(server.listener)
-        .put(`/events/${testEvent.id}`)
+        .put(`/events/${testEvent.sid}`)
         .send(eventUpd)
         .set('Authorization', `Bearer ${eventCreator.token}`)
         .end((err, res) => {
@@ -165,6 +168,7 @@ describe('Events', () => {
           let event = res.body;
 
           expect(event.id).to.be.equal(testEvent.id);
+          expect(event.sid).to.be.equal(testEvent.sid);
           expect(event.owner).to.be.equal(eventCreator.id);
 
           Object.keys(eventUpd).forEach( k => {
@@ -177,7 +181,7 @@ describe('Events', () => {
 
     it('must NOT allow to update an event if is the not owner', done => {
       chai.request(server.listener)
-        .put(`/events/${testEvent.id}`)
+        .put(`/events/${testEvent.sid}`)
         .send({})
         .set('Authorization', `Bearer ${commonUsers[0].token}`)
         .end((err, res) => {
@@ -194,7 +198,7 @@ describe('Events', () => {
         .end((err, res) => {
           expect(res.status).to.be.equal(404);
 
-          let fakeId = mongoose.Types.ObjectId();
+          let fakeId = shortid.generate();
           chai.request(server.listener)
             .put(`/events/${fakeId}`)
             .send({})
@@ -208,11 +212,11 @@ describe('Events', () => {
 
   });
 
-  describe('DELETE /events/{id}', () => {
+  describe('DELETE /events/{sid}', () => {
 
     it('must NOT allow to delete an event if is the not owner', done => {
       chai.request(server.listener)
-        .delete(`/events/${testEvent.id}`)
+        .delete(`/events/${testEvent.sid}`)
         .set('Authorization', `Bearer ${commonUsers[0].token}`)
         .end((err, res) => {
           expect(res.status).to.be.equal(403);
@@ -227,7 +231,7 @@ describe('Events', () => {
         .end((err, res) => {
           expect(res.status).to.be.equal(404);
 
-          let fakeId = mongoose.Types.ObjectId();
+          let fakeId = shortid.generate();
           chai.request(server.listener)
             .delete(`/events/${fakeId}`)
             .set('Authorization', `Bearer ${eventCreator.token}`)
@@ -238,9 +242,9 @@ describe('Events', () => {
         });
     });
 
-    it('must allow to delete an event by id', done => {
+    it('must allow to delete an event by sid', done => {
       chai.request(server.listener)
-        .delete(`/events/${testEvent.id}`)
+        .delete(`/events/${testEvent.sid}`)
         .set('Authorization', `Bearer ${eventCreator.token}`)
         .end((err, res) => {
           expect(res.status).to.be.equal(204);

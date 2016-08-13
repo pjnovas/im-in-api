@@ -7,7 +7,7 @@ import chain from './chain';
 
 const fetchEvent = async (request, reply) => {
   try {
-    let event = await Event.findById(request.params.id);
+    let event = await Event.findOne({sid: request.params.sid});
 
     if (!event) {
       return reply(Boom.notFound());

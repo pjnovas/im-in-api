@@ -1,8 +1,10 @@
 'use strict';
 
 import mongoose from 'mongoose';
+import { generate } from 'shortid';
 
 const EventSchema = new mongoose.Schema({
+  sid: { type: String, unique: true, default: generate },
   owner: { type: mongoose.Schema.Types.ObjectId, ref: 'User' },
   title: { type: String, required : true },
   datetime: { type: Date, required : true },
