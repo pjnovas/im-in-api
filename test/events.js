@@ -62,11 +62,31 @@ describe('Events', () => {
 
   after(clearDB);
 
+  describe('GET /events/categories', () => {
+
+    it('must retrieve all categories for an event', done => {
+      chai.request(server.listener)
+        .get('/events/categories')
+        .end((err, res) => {
+          expect(res.status).to.be.equal(200);
+
+          expect(res.body).to.be.an('array');
+          require('../src/data/categories').forEach( c => {
+            expect(res.body).to.contain(c);
+          })
+
+          done();
+        });
+    });
+
+  });
+
   describe('POST /events', () => {
 
     it('must allow to create an event', done => {
       const event = {
         title: 'Event Title',
+        category: 'tenis',
         datetime: (new Date).toISOString(),
         location: 'Some point in somewhere',
         info: 'Event Description',
@@ -169,6 +189,7 @@ describe('Events', () => {
     it('must allow to update an event by sid', done => {
       const eventUpd = {
         title: 'Event Title Upd',
+        category: 'asado',
         datetime: (new Date).toISOString(),
         location: 'Some point in somewhere Upd',
         info: 'Event Description Upd',

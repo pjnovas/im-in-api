@@ -5,6 +5,8 @@ import Boom from 'boom';
 import { Event } from '../models';
 import chain from './chain';
 
+const categories = require('../data/categories');
+
 const fetchEvent = async (request, reply) => {
   try {
     let event =
@@ -55,6 +57,7 @@ exports.create = {
   validate: {
     payload: {
       title: Joi.string().required(),
+      category: Joi.any().only(categories),
       datetime: Joi.date().required(),
       location: Joi.string().required(),
       info: Joi.string(),
@@ -85,6 +88,7 @@ exports.update = {
   validate: {
     payload: {
       title: Joi.string(),
+      category: Joi.any().only(categories),
       datetime: Joi.date(),
       location: Joi.string(),
       info: Joi.string(),
@@ -139,4 +143,10 @@ exports.leave = {
     await request.event.save();
     return reply().code(204);
   })
+};
+
+exports.getCategories = {
+  handler: (request, reply) => {
+    reply(categories).code(200);
+  }
 };

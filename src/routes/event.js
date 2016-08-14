@@ -6,7 +6,8 @@ import {
   update,
   remove,
   join,
-  leave
+  leave,
+  getCategories
 } from '../controller/events';
 
 export default [
@@ -16,5 +17,6 @@ export default [
   { method: ['PATCH', 'PUT'], path: '/events/{sid}', config: update },
   { method: 'DELETE', path: '/events/{sid}', config: remove },
   { method: 'POST', path: '/events/{sid}/attendants', config: join },
-  { method: 'DELETE', path: '/events/{sid}/attendants', config: leave }
+  { method: 'DELETE', path: '/events/{sid}/attendants', config: leave },
+  { method: 'GET', path: '/events/categories', config: getCategories }
 ];
